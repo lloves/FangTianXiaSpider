@@ -189,6 +189,7 @@ class HomeSpider(scrapy.Spider):
         #house_intro = response.xpath('//div[contains(@class,"shop_list")]/dl')
         item['name'] = house_name
         item['intro'] = house_intro
+        yield item
 
     def get_new_code(self, response):
         try:
