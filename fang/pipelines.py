@@ -14,8 +14,10 @@ class FangPipeline(object):
     def __init__(self):
         self.newhouse_fp = open('newhouse.json','wb')
         self.esfhouse_fp = open('esfhouse.json', 'wb')
+        self.house_intro = open('house_intro.json', 'wb')
         self.newhouse_exporter = JsonItemExporter(self.newhouse_fp, ensure_ascii=False)
         self.esfhouse_exporter = JsonItemExporter(self.esfhouse_fp, ensure_ascii=False)
+        self.house_intro_exporter = JsonItemExporter(self.house_intro, ensure_ascii=False)
 
     def process_item(self, item, spider):
         if isinstance(item, NewHouseItem):
@@ -23,13 +25,14 @@ class FangPipeline(object):
         elif isinstance(item,ESFHouseItem):
             self.esfhouse_exporter.export_item(item)
         elif isinstance(item,HouseIntroItem):
-            self.esfhouse_exporter.export_item(item)
+            self.house_intro_exporter.export_item(item)
         else:
             return item
 
     def close_spider(self, spider):
         self.newhouse_fp.close()
         self.esfhouse_fp.close()
+        self.house_intro.close()
 
 class MongoPipeline(object):
 
@@ -93,6 +96,14 @@ class MysqlPipeline(object):
             print('创建数据表成功Tables created')
         except Exception as e:
             print('The table newhouse exists!', e)
+            
+        try:
+            self.cursor.execute('create table esfhouse(id int AUTO_INCREMENT PRIMARY KEY, 小区名 VARCHAR(20) NULL, '
+                                '简介 VARCHAR(2000) NULL)')
+            print('创建数据表成功Tables created')
+        except Exception as e:
+            print('The table newhouse exists!', e)
+
         if isinstance(item, NewHouseItem):
             try:
                 # 往数据库里面写入数据
